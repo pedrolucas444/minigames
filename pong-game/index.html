@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pong Game</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="menu-wrapper">
+    <div id="menu">
+        <h1>Pong Game</h1>
+        <p>Como você quer controlar a raquete?</p>
+        <button id="mouseBtn">Mouse</button>
+        <button id="keyboardBtn">Teclado</button>
+    </div>
+    </div>
+    <canvas id="pong" width="800" height="500" style="display:none;"></canvas>
+    <div id="winner" style="display:none;">
+        <div id="winner-text"></div>
+        <div class="winner-btns">
+            <button id="playAgainBtn">JOGAR NOVAMENTE</button>
+            <button id="mainMenuBtn">MENU PRINCIPAL</button>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,52 @@
+body {
+    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+    min-height: 100vh;
+    margin: 0;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.container {
+    background: rgba(255,255,255,0.95);
+    padding: 40px 32px 32px 32px;
+    border-radius: 18px;
+    box-shadow: 0 8px 32px rgba(30,60,114,0.18);
+    text-align: center;
+    min-width: 320px;
+}
+
+h1 {
+    color: #1e3c72;
+    margin-bottom: 8px;
+}
+
+p {
+    color: #444;
+    margin-bottom: 24px;
+}
+
+.games-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+button {
+    background: #2a5298;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 14px 0;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.2s;
+    font-weight: 600;
+    box-shadow: 0 2px 8px rgba(30,60,114,0.08);
+}
+
+button:hover {
+    background: #1e3c72;
+    transform: translateY(-2px) scale(1.04);
+}
