@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jogo da Velha</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Jogo da Velha</h1>
+        <div style="position: relative; width: 270px; height: 270px; margin: 24px auto 0 auto;">
+            <div id="game-board" class="board" style="position: absolute; left: 0; top: 0;"></div>
+            <svg id="win-line" width="270" height="270" style="position:absolute; left:0; top:0; pointer-events:none; z-index:2; display:none;"></svg>
+        </div>
+        <div id="status"></div>
+    <!-- Botões agora estão no modal de vitória -->
+        <div id="victory-modal" style="display:none;">
+            <div class="victory-content">
+                <div class="victory-title">Vitória</div>
+                <div class="victory-symbol" id="victory-symbol"></div>
+                <div class="victory-btns" style="margin-top: 32px; display: flex; gap: 16px; justify-content: center;">
+                    <button id="restart-btn">Reiniciar</button>
+                    <a href="../tela-inicial/index.html" class="menu-link">Menu Principal</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
