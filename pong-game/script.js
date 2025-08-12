@@ -1,17 +1,33 @@
 const canvas = document.getElementById('pong');
 const ctx = canvas.getContext('2d');
-const menu = document.getElementById('menu');
-const winnerDiv = document.getElementById('winner');
-const mouseBtn = document.getElementById('mouseBtn');
-const keyboardBtn = document.getElementById('keyboardBtn');
+const modal = document.getElementById('startModal');
+const step1 = document.getElementById('step1');
+const step2 = document.getElementById('step2');
 
-let controlMode = null;
+const onePlayerBtn = document.getElementById('onePlayerBtn');
+const twoPlayersBtn = document.getElementById('twoPlayersBtn');
+const difficultyBtns = document.querySelectorAll('.difficultyBtn');
+
+const winnerDiv = document.getElementById('winner');
+const winnerText = document.getElementById('winner-text');
+const playAgainBtn = document.getElementById('playAgainBtn');
+const mainMenuBtn = document.getElementById('mainMenuBtn');
+
+let mode = null; // '1p' ou '2p'
+let difficulty = null;
 let animationId;
 
 const paddleWidth = 15, paddleHeight = 90;
-const player = { x: 10, y: canvas.height/2 - paddleHeight/2, w: paddleWidth, h: paddleHeight, score: 0, dy: 0 };
-const bot = { x: canvas.width - paddleWidth - 10, y: canvas.height/2 - paddleHeight/2, w: paddleWidth, h: paddleHeight, score: 0, dy: 0 };
+const player1 = { x: 10, y: canvas.height/2 - paddleHeight/2, w: paddleWidth, h: paddleHeight, score: 0, dy: 0 };
+const player2 = { x: canvas.width - paddleWidth - 10, y: canvas.height/2 - paddleHeight/2, w: paddleWidth, h: paddleHeight, score: 0, dy: 0 };
 const ball = { x: canvas.width/2, y: canvas.height/2, r: 10, speed: 6, dx: 6, dy: 3 };
+
+let botSpeed = 4;
+
+function setDifficulty(diff) {
+    const speeds = { facil: 3, medio: 5, dificil: 7, impossivel: 10 };
+    botSpeed = speeds[diff] || 5;
+}
 
 function resetBall() {
     ball.x = canvas.width/2;
@@ -38,62 +54,58 @@ function drawText(text, x, y, size=40, color='#fff') {
 
 function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    // Meio
     for(let i=0; i<canvas.height; i+=30) drawRect(canvas.width/2-2, i, 4, 20, '#888');
-    // Placar
-    drawText(player.score, canvas.width/2-60, 50);
-    drawText(bot.score, canvas.width/2+30, 50);
-    // Raquetes
-    drawRect(player.x, player.y, player.w, player.h);
-    drawRect(bot.x, bot.y, bot.w, bot.h);
-    // Bola
+    drawText(player1.score, canvas.width/2-60, 50);
+    drawText(player2.score, canvas.width/2+30, 50);
+    drawRect(player1.x, player1.y, player1.w, player1.h);
+    drawRect(player2.x, player2.y, player2.w, player2.h);
     drawCircle(ball.x, ball.y, ball.r);
 }
 
 function update() {
-    // Jogador
-    if(controlMode === 'keyboard') {
-        player.y += player.dy;
-        if(player.y < 0) player.y = 0;
-        if(player.y + player.h > canvas.height) player.y = canvas.height - player.h;
+    player1.y += player1.dy;
+    if(player1.y < 0) player1.y = 0;
+    if(player1.y + player1.h > canvas.height) player1.y = canvas.height - player1.h;
+
+    if(mode === '1p') {
+        let target = ball.y - player2.h/2;
+        if(player2.y < target) player2.y += Math.min(botSpeed, target-player2.y);
+        else if(player2.y > target) player2.y -= Math.min(botSpeed, player2.y-target);
+    } else {
+        player2.y += player2.dy;
     }
-    // Bot
-    let target = ball.y - bot.h/2;
-    if(bot.y < target) bot.y += Math.min(5, target-bot.y);
-    else if(bot.y > target) bot.y -= Math.min(5, bot.y-target);
-    if(bot.y < 0) bot.y = 0;
-    if(bot.y + bot.h > canvas.height) bot.y = canvas.height - bot.h;
-    // Bola
+    if(player2.y < 0) player2.y = 0;
+    if(player2.y + player2.h > canvas.height) player2.y = canvas.height - player2.h;
+
     ball.x += ball.dx;
     ball.y += ball.dy;
-    // Colisão topo/baixo
+
     if(ball.y-ball.r < 0 || ball.y+ball.r > canvas.height) ball.dy *= -1;
-    // Colisão raquete jogador
-    if(ball.x-ball.r < player.x+player.w && ball.y > player.y && ball.y < player.y+player.h) {
+
+    // colisão player1
+    if(ball.x-ball.r < player1.x+player1.w && ball.y > player1.y && ball.y < player1.y+player1.h) {
         ball.dx *= -1;
-        ball.x = player.x+player.w+ball.r;
-        // Calcula o ponto de impacto relativo (-1 topo, 0 meio, 1 base)
-        let rel = ((ball.y - player.y) - player.h/2) / (player.h/2);
-        ball.dy = rel * ball.speed;
-        // Pequena aleatoriedade
-        ball.dy += (Math.random()-0.5)*1.2;
-    }
-    // Colisão raquete bot
-    if(ball.x+ball.r > bot.x && ball.y > bot.y && ball.y < bot.y+bot.h) {
-        ball.dx *= -1;
-        ball.x = bot.x-ball.r;
-        let rel = ((ball.y - bot.y) - bot.h/2) / (bot.h/2);
+        ball.x = player1.x+player1.w+ball.r;
+        let rel = ((ball.y - player1.y) - player1.h/2) / (player1.h/2);
         ball.dy = rel * ball.speed;
         ball.dy += (Math.random()-0.5)*1.2;
     }
-    // Pontuação
-    if(ball.x < 0) { bot.score++; resetBall(); }
-    if(ball.x > canvas.width) { player.score++; resetBall(); }
+    // colisão player2
+    if(ball.x+ball.r > player2.x && ball.y > player2.y && ball.y < player2.y+player2.h) {
+        ball.dx *= -1;
+        ball.x = player2.x-ball.r;
+        let rel = ((ball.y - player2.y) - player2.h/2) / (player2.h/2);
+        ball.dy = rel * ball.speed;
+        ball.dy += (Math.random()-0.5)*1.2;
+    }
+
+    if(ball.x < 0) { player2.score++; resetBall(); }
+    if(ball.x > canvas.width) { player1.score++; resetBall(); }
 }
 
 function checkWinner() {
-    if(player.score >= 7) return 'Você venceu!';
-    if(bot.score >= 7) return 'O bot venceu!';
+    if(player1.score >= 7) return mode === '1p' ? 'Você venceu!' : 'Jogador 1 venceu!';
+    if(player2.score >= 7) return mode === '1p' ? 'O bot venceu!' : 'Jogador 2 venceu!';
     return null;
 }
 
@@ -104,76 +116,65 @@ function gameLoop() {
     if(win) {
         cancelAnimationFrame(animationId);
         canvas.style.display = 'none';
-        // Mostrar tela de vencedor customizada
-        const winnerText = document.getElementById('winner-text');
-        const playAgainBtn = document.getElementById('playAgainBtn');
-        const mainMenuBtn = document.getElementById('mainMenuBtn');
         winnerText.innerText = win;
         winnerDiv.style.display = 'flex';
-        winnerText.style.display = 'block';
-        playAgainBtn.style.display = 'inline-block';
-        mainMenuBtn.style.display = 'inline-block';
-        // Remover listener antigo para evitar múltiplos
-        playAgainBtn.onclick = function() {
-            winnerDiv.style.display = 'none';
-            playAgainBtn.style.display = 'none';
-            mainMenuBtn.style.display = 'none';
-            winnerText.style.display = 'none';
-            canvas.style.display = 'block';
-            player.score = 0;
-            bot.score = 0;
-            player.y = canvas.height/2 - paddleHeight/2;
-            bot.y = canvas.height/2 - paddleHeight/2;
-            resetBall();
-            animationId = requestAnimationFrame(gameLoop);
-        };
-        mainMenuBtn.onclick = function() {
-            window.location.href = '../tela-inicial/index.html';
-        };
         return;
     }
     animationId = requestAnimationFrame(gameLoop);
 }
 
-function startGame(mode) {
-    controlMode = mode;
-    menu.style.display = 'none';
+function startGame() {
+    modal.style.display = 'none';
     canvas.style.display = 'block';
-    winnerDiv.style.display = 'none';
-    player.score = 0;
-    bot.score = 0;
-    player.y = canvas.height/2 - paddleHeight/2;
-    bot.y = canvas.height/2 - paddleHeight/2;
+    player1.score = 0;
+    player2.score = 0;
+    player1.y = canvas.height/2 - paddleHeight/2;
+    player2.y = canvas.height/2 - paddleHeight/2;
     resetBall();
-    if(controlMode === 'mouse') {
-        canvas.addEventListener('mousemove', mouseMoveHandler);
-        window.removeEventListener('keydown', keyDownHandler);
-        window.removeEventListener('keyup', keyUpHandler);
-    } else {
-        window.addEventListener('keydown', keyDownHandler);
-        window.addEventListener('keyup', keyUpHandler);
-        canvas.removeEventListener('mousemove', mouseMoveHandler);
-    }
     animationId = requestAnimationFrame(gameLoop);
 }
 
-function mouseMoveHandler(e) {
-    const rect = canvas.getBoundingClientRect();
-    let mouseY = e.clientY - rect.top;
-    player.y = mouseY - player.h/2;
-    if(player.y < 0) player.y = 0;
-    if(player.y + player.h > canvas.height) player.y = canvas.height - player.h;
-}
-
 function keyDownHandler(e) {
-    if(e.key === 'ArrowUp' || e.key === 'w') player.dy = -8;
-    if(e.key === 'ArrowDown' || e.key === 's') player.dy = 8;
+    if(e.key === 'w') player1.dy = -8;
+    if(e.key === 's') player1.dy = 8;
+    if(mode === '2p') {
+        if(e.key === 'ArrowUp') player2.dy = -8;
+        if(e.key === 'ArrowDown') player2.dy = 8;
+    }
 }
 function keyUpHandler(e) {
-    if(e.key === 'ArrowUp' || e.key === 'w' || e.key === 'ArrowDown' || e.key === 's') player.dy = 0;
+    if(e.key === 'w' || e.key === 's') player1.dy = 0;
+    if(mode === '2p') {
+        if(e.key === 'ArrowUp' || e.key === 'ArrowDown') player2.dy = 0;
+    }
 }
 
-mouseBtn.onclick = () => startGame('mouse');
-keyboardBtn.onclick = () => startGame('keyboard');
+window.addEventListener('keydown', keyDownHandler);
+window.addEventListener('keyup', keyUpHandler);
 
-// (Removido: reiniciar ao clicar no placar final, agora é feito pelos botões)
+// Botões do modal
+onePlayerBtn.onclick = () => {
+    mode = '1p';
+    step1.style.display = 'none';
+    step2.style.display = 'block';
+};
+twoPlayersBtn.onclick = () => {
+    mode = '2p';
+    startGame();
+};
+difficultyBtns.forEach(btn => {
+    btn.onclick = () => {
+        difficulty = btn.dataset.diff;
+        setDifficulty(difficulty);
+        startGame();
+    };
+});
+
+// Botões de vencedor
+playAgainBtn.onclick = () => {
+    winnerDiv.style.display = 'none';
+    startGame();
+};
+mainMenuBtn.onclick = () => {
+    window.location.reload();
+};

@@ -7,15 +7,30 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="menu-wrapper">
-    <div id="menu">
-        <h1>Pong Game</h1>
-        <p>Como você quer controlar a raquete?</p>
-        <button id="mouseBtn">Mouse</button>
-        <button id="keyboardBtn">Teclado</button>
+
+    <!-- Modal -->
+    <div id="startModal" class="modal">
+        <div class="modal-content">
+            <h1>Pong Game</h1>
+            <div id="step1">
+                <p>Selecione o modo de jogo:</p>
+                <button id="onePlayerBtn">1 Jogador</button>
+                <button id="twoPlayersBtn">2 Jogadores</button>
+            </div>
+
+            <div id="step2" style="display:none;">
+                <p>Selecione a dificuldade:</p>
+                <button class="difficultyBtn" data-diff="facil">Fácil</button>
+                <button class="difficultyBtn" data-diff="medio">Médio</button>
+                <button class="difficultyBtn" data-diff="dificil">Difícil</button>
+                <button class="difficultyBtn" data-diff="impossivel">Impossível</button>
+            </div>
+        </div>
     </div>
-    </div>
+
     <canvas id="pong" width="800" height="500" style="display:none;"></canvas>
+
+    <!-- Tela de vencedor -->
     <div id="winner" style="display:none;">
         <div id="winner-text"></div>
         <div class="winner-btns">
@@ -23,6 +38,7 @@
             <button id="mainMenuBtn">MENU PRINCIPAL</button>
         </div>
     </div>
+
     <script src="script.js"></script>
 </body>
 </html>
